@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/rancher/rke/metadata"
 	"os"
 	"reflect"
 	"strings"
