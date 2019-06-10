@@ -19,7 +19,7 @@ var (
 )
 
 func InitMetadata(ctx context.Context) error {
-	rke.InitRKE(false)
+	rke.InitRKE()
 	initK8sRKESystemImages()
 	initAddonTemplates()
 	initServiceOptions()
