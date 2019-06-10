@@ -58,7 +58,7 @@ var (
 	RKEDefaultK8sVersions map[string]string
 )
 
-func InitRKE(writeData bool) {
+func InitRKE() {
 	DriverData = Data{
 		K8sVersionRKESystemImages: loadK8sRKESystemImages(),
 	}
@@ -94,17 +94,21 @@ func InitRKE(writeData bool) {
 
 	DriverData.RancherDefaultK8sVersions = loadRancherDefaultK8sVersions()
 
-	if writeData {
-		//todo: more optimization on how data is stored in file
-		strData, _ := json.MarshalIndent(DriverData, "", " ")
-		jsonFile, err := os.Create(rkeDataFilePath)
-		if err != nil {
-			panic(fmt.Errorf("err %v", err))
+	if len(os.Args) == 1 {
+		splitStr := strings.SplitN(os.Args[1], "=", 2)
+		if len(splitStr) == 2 {
+			if splitStr[0] == "write-data" && splitStr[1] == "true" {
+				//todo: more optimization on how data is stored in file
+				strData, _ := json.MarshalIndent(DriverData, "", " ")
+				jsonFile, err := os.Create(rkeDataFilePath)
+				if err != nil {
+					panic(fmt.Errorf("err %v", err))
+				}
+				jsonFile.Write(strData)
+				jsonFile.Close()
+			}
 		}
-		jsonFile.Write(strData)
-		jsonFile.Close()
 	}
-
 }
 
 func getToolsSystemImages() ToolsSystemImages {
