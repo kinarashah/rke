@@ -2,7 +2,10 @@ module github.com/rancher/rke
 
 go 1.12
 
-replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.9.0
+replace (
+	github.com/go-resty/resty => gopkg.in/resty.v1 v1.9.0
+	github.com/rancher/kontainer-driver-metadata => github.com/kinarashah/kontainer-driver-metadata v0.0.0-20190826232909-902f69dd6bd7
+)
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
