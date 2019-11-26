@@ -4,6 +4,8 @@ import (
 	"github.com/rancher/norman/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	intstr "k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/util/sets"
 	apiserverv1alpha1 "k8s.io/apiserver/pkg/apis/apiserver/v1alpha1"
 	auditv1 "k8s.io/apiserver/pkg/apis/audit/v1"
 	apiserverconfig "k8s.io/apiserver/pkg/apis/config"
@@ -59,6 +61,16 @@ type RancherKubernetesEngineConfig struct {
 	RotateCertificates *RotateCertificates `yaml:"rotate_certificates,omitempty" json:"rotateCertificates,omitempty"`
 	// DNS Config
 	DNS *DNSConfig `yaml:"dns" json:"dns,omitempty"`
+	// Upgrade Strategy
+	NodeUpgradeStrategy *NodeUpgradeStrategy `yaml:"node_upgrade_strategy,omitempty" json:"nodeUpgradeStrategy,omitempty"`
+}
+
+type NodeUpgradeStrategy struct {
+	RollingUpdate *RollingUpdateStrategy `yaml:"rolling_update_strategy,omitempty" json:"rollingUpdateStrategy,omitempty"`
+}
+
+type RollingUpdateStrategy struct {
+	MaxUnavailable intstr.IntOrString `yaml:"max_unavailable,omitempty" json:"maxUnavailable,omitempty"`
 }
 
 type BastionHost struct {
@@ -114,6 +126,8 @@ type RKESystemImages struct {
 	CoreDNS string `yaml:"coredns" json:"coredns,omitempty"`
 	// CoreDNS autoscaler image
 	CoreDNSAutoscaler string `yaml:"coredns_autoscaler" json:"corednsAutoscaler,omitempty"`
+	// Nodelocal image
+	Nodelocal string `yaml:"nodelocal" json:"nodelocal,omitempty"`
 	// Kubernetes image
 	Kubernetes string `yaml:"kubernetes" json:"kubernetes,omitempty"`
 	// Flannel image
@@ -354,6 +368,8 @@ type NetworkConfig struct {
 	Plugin string `yaml:"plugin" json:"plugin,omitempty" norman:"default=canal"`
 	// Plugin options to configure network properties
 	Options map[string]string `yaml:"options" json:"options,omitempty"`
+	// Set MTU for CNI provider
+	MTU string `yaml:"mtu" json:"mtu,omitempty"`
 	// CalicoNetworkProvider
 	CalicoNetworkProvider *CalicoNetworkProvider `yaml:"calico_network_provider,omitempty" json:"calicoNetworkProvider,omitempty"`
 	// CanalNetworkProvider
@@ -442,6 +458,54 @@ type RKEConfigNodePlan struct {
 	Taints []RKETaint `json:"taints,omitempty"`
 }
 
+type RKEClusterPlan struct {
+	// Map of cluster plan for RKE worker nodes
+	Processes map[string]RKEProcess
+}
+
+type RKEProcess struct {
+	// Process name, this should be the container name
+	Name string `json:"name,omitempty"`
+	// Process Entrypoint command
+	Command []string `json:"command,omitempty"`
+	// Process command map
+	CommandMap map[string]string `json:"commandMap,omitempty"`
+	// Process args
+	Args []string `json:"args,omitempty"`
+	// Process args map
+	ArgsMap map[string]sets.Empty `json:"argsMap,omitempty"`
+	// Environment variables list
+	Env []string `json:"env,omitempty"`
+	// Environment variables map
+	EnvMap map[string]sets.Empty `json:"envMap,omitempty"`
+	// Process docker image
+	Image string `json:"image,omitempty"`
+	//AuthConfig for image private registry
+	ImageRegistryAuthConfig string `json:"imageRegistryAuthConfig,omitempty"`
+	// Process docker image VolumesFrom
+	VolumesFrom []string `json:"volumesFrom,omitempty"`
+	// Process docker container bind mounts
+	Binds []string `json:"binds,omitempty"`
+	// Process docker container bind mounts
+	BindsMap map[string]sets.Empty `json:"bindsMap,omitempty"`
+	// Process docker container netwotk mode
+	NetworkMode string `json:"networkMode,omitempty"`
+	// Process container restart policy
+	RestartPolicy string `json:"restartPolicy,omitempty"`
+	// Process container pid mode
+	PidMode string `json:"pidMode,omitempty"`
+	// Run process in privileged container
+	Privileged bool `json:"privileged,omitempty"`
+	// Process healthcheck
+	HealthCheck HealthCheck `json:"healthCheck,omitempty"`
+	// Process docker container Labels
+	Labels map[string]string `json:"labels,omitempty"`
+	// Process docker publish container's port to host
+	Publish []string `json:"publish,omitempty"`
+	// docker will run the container with this user
+	User string `json:"user,omitempty"`
+}
+
 type Process struct {
 	// Process name, this should be the container name
 	Name string `json:"name,omitempty"`
@@ -525,6 +589,8 @@ type WeaveNetworkProvider struct {
 }
 
 type KubernetesServicesOptions struct {
+	// Additional options passed to Etcd
+	Etcd map[string]string `json:"etcd"`
 	// Additional options passed to KubeAPI
 	KubeAPI map[string]string `json:"kubeapi"`
 	// Additional options passed to Kubelet
@@ -814,6 +880,12 @@ type DNSConfig struct {
 	StubDomains map[string][]string `yaml:"stubdomains" json:"stubdomains,omitempty"`
 	// NodeSelector key pair
 	NodeSelector map[string]string `yaml:"node_selector" json:"nodeSelector,omitempty"`
+	// Nodelocal DNS
+	Nodelocal *Nodelocal `yaml:"nodelocal" json:"nodelocal,omitempy"`
+}
+
+type Nodelocal struct {
+	IPAddress string `yaml:"ipaddress" json:"ipAddress,omitempy"`
 }
 
 type RKETaint struct {

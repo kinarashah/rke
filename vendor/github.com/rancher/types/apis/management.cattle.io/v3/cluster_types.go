@@ -30,7 +30,7 @@ const (
 	ClusterActionBackupEtcd            = "backupEtcd"
 	ClusterActionRestoreFromEtcdBackup = "restoreFromEtcdBackup"
 	ClusterActionRotateCertificates    = "rotateCertificates"
-	ClusterActionRunCISScan            = "runSecurityScan"
+	ClusterActionRunSecurityScan       = "runSecurityScan"
 	ClusterActionSaveAsTemplate        = "saveAsTemplate"
 
 	// ClusterConditionReady Cluster ready to serve API (healthy when true, unhealthy when false)
@@ -146,6 +146,13 @@ type ClusterStatus struct {
 	MonitoringStatus                     *MonitoringStatus         `json:"monitoringStatus,omitempty" norman:"nocreate,noupdate"`
 	IstioEnabled                         bool                      `json:"istioEnabled,omitempty" norman:"nocreate,noupdate,default=false"`
 	CertificatesExpiration               map[string]CertExpiration `json:"certificatesExpiration,omitempty"`
+	NodeUpgradeStatus                    *NodeUpgradeStatus        `json:"nodeUpgradeStatus,omitempty" norman:"nocreate,noupdate"`
+}
+
+type NodeUpgradeStatus struct {
+	Token string          `json:"token"`
+	State string          `json:"state"`
+	Nodes map[string]bool `json:"nodes"`
 }
 
 type ClusterComponentStatus struct {
@@ -292,6 +299,11 @@ type CertExpiration struct {
 }
 
 type SaveAsTemplateInput struct {
+	ClusterTemplateName         string `json:"clusterTemplateName,omitempty"`
+	ClusterTemplateRevisionName string `json:"clusterTemplateRevisionName,omitempty"`
+}
+
+type SaveAsTemplateOutput struct {
 	ClusterTemplateName         string `json:"clusterTemplateName,omitempty"`
 	ClusterTemplateRevisionName string `json:"clusterTemplateRevisionName,omitempty"`
 }
