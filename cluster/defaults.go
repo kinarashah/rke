@@ -37,6 +37,7 @@ const (
 
 	DefaultSSHPort        = "22"
 	DefaultDockerSockPath = "/var/run/docker.sock"
+	DefaultDockerRootDir  = "/var/lib/docker"
 
 	DefaultAuthStrategy      = "x509"
 	DefaultAuthorizationMode = "rbac"

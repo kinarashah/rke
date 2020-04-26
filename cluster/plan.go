@@ -15,6 +15,7 @@ import (
 	"github.com/rancher/rke/docker"
 	"github.com/rancher/rke/hosts"
 	"github.com/rancher/rke/k8s"
+	"github.com/rancher/rke/log"
 	"github.com/rancher/rke/metadata"
 	"github.com/rancher/rke/pki"
 	"github.com/rancher/rke/services"
@@ -85,7 +86,11 @@ func GeneratePlan(ctx context.Context, rkeConfig *v3.RancherKubernetesEngineConf
 		if err != nil {
 			return clusterPlan, err
 		}
-		clusterPlan.Nodes = append(clusterPlan.Nodes, BuildRKEConfigNodePlan(ctx, myCluster, host, hostsInfoMap[host.Address], svcOptions))
+		if host.DockerInfo.DockerRootDir == "" {
+			log.Debugf(ctx, "cluster[%s]: generatePlan defaulting dockerRootDir for host [%s]", myCluster.ClusterName, host.NodeName)
+			host.DockerInfo.DockerRootDir = DefaultDockerRootDir
+		}
+		clusterPlan.Nodes = append(clusterPlan.Nodes, BuildRKEConfigNodePlan(ctx, myCluster, host, host.DockerInfo, svcOptions))
 	}
 	return clusterPlan, nil
 }
