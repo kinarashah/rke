@@ -910,7 +910,7 @@ type MonitoringConfig struct {
 	// Tolerations for Deployments
 	Tolerations []v1.Toleration `yaml:"tolerations" json:"tolerations,omitempty"`
 	// Priority class name for Metrics-Server's "metrics-server" deployment
-	MetricsServerPriorityClassName string `yaml:"metrics_server_priority_class_name" json:"metricsServerPriorityClassName,omitempty" norman:"default=system-cluster-critical"`
+	MetricsServerPriorityClassName string `yaml:"metrics_server_priority_class_name" json:"metricsServerPriorityClassName,omitempty"`
 }
 
 type RestoreConfig struct {
