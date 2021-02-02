@@ -929,6 +929,8 @@ type DNSConfig struct {
 	StubDomains map[string][]string `yaml:"stubdomains" json:"stubdomains,omitempty"`
 	// NodeSelector key pair
 	NodeSelector map[string]string `yaml:"node_selector" json:"nodeSelector,omitempty"`
+	// KeySelector
+	KeySelector map[string]string `yaml:"key_selector" json:"keySelector,omitempty"`
 	// Nodelocal DNS
 	Nodelocal *Nodelocal `yaml:"nodelocal" json:"nodelocal,omitempy"`
 	// Update strategy
