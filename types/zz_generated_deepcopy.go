@@ -454,6 +454,13 @@ func (in *DNSConfig) DeepCopyInto(out *DNSConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.Options != nil {
+		in, out := &in.Options, &out.Options
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.Nodelocal != nil {
 		in, out := &in.Nodelocal, &out.Nodelocal
 		*out = new(Nodelocal)
