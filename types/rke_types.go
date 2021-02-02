@@ -447,6 +447,10 @@ type IngressConfig struct {
 	Tolerations []v1.Toleration `yaml:"tolerations" json:"tolerations,omitempty"`
 	// Enable or disable nginx default-http-backend
 	DefaultBackend *bool `yaml:"default_backend" json:"defaultBackend,omitempty" norman:"default=true"`
+	// Priority class name for Nginx-Ingress's "default-http-backend" deployment
+	DefaultHTTPBackendPriorityClassName string `yaml:"default_http_backend_priority_class_name" json:"defaultHttpBackendPriorityClassName,omitempty"`
+	// Priority class name for Nginx-Ingress's "nginx-ingress-controller" daemonset
+	NginxIngressControllerPriorityClassName string `yaml:"nginx_ingress_controller_priority_class_name" json:"nginxIngressControllerPriorityClassName,omitempty"`
 }
 
 type ExtraEnv struct {
@@ -905,6 +909,8 @@ type MonitoringConfig struct {
 	Replicas *int32 `yaml:"replicas" json:"replicas,omitempty" norman:"default=1"`
 	// Tolerations for Deployments
 	Tolerations []v1.Toleration `yaml:"tolerations" json:"tolerations,omitempty"`
+	// Priority class name for Metrics-Server's "metrics-server" deployment
+	MetricsServerPriorityClassName string `yaml:"metrics_server_priority_class_name" json:"metricsServerPriorityClassName,omitempty" norman:"default=system-cluster-critical"`
 }
 
 type RestoreConfig struct {
@@ -921,6 +927,8 @@ type RotateCertificates struct {
 type DNSConfig struct {
 	// DNS provider
 	Provider string `yaml:"provider" json:"provider,omitempty"`
+	// DNS config options
+	Options map[string]string `yaml:"options" json:"options,omitempty"`
 	// Upstream nameservers
 	UpstreamNameservers []string `yaml:"upstreamnameservers" json:"upstreamnameservers,omitempty"`
 	// ReverseCIDRs
@@ -930,7 +938,7 @@ type DNSConfig struct {
 	// NodeSelector key pair
 	NodeSelector map[string]string `yaml:"node_selector" json:"nodeSelector,omitempty"`
 	// Nodelocal DNS
-	Nodelocal *Nodelocal `yaml:"nodelocal" json:"nodelocal,omitempy"`
+	Nodelocal *Nodelocal `yaml:"nodelocal" json:"nodelocal,omitempty"`
 	// Update strategy
 	UpdateStrategy *DeploymentStrategy `yaml:"update_strategy" json:"updateStrategy,omitempty"`
 	// Autoscaler fields to determine number of dns replicas
@@ -941,11 +949,13 @@ type DNSConfig struct {
 
 type Nodelocal struct {
 	// link-local IP for nodelocal DNS
-	IPAddress string `yaml:"ip_address" json:"ipAddress,omitempy"`
+	IPAddress string `yaml:"ip_address" json:"ipAddress,omitempty"`
 	// Nodelocal DNS daemonset upgrade strategy
 	UpdateStrategy *DaemonSetUpdateStrategy `yaml:"update_strategy" json:"updateStrategy,omitempty"`
 	// NodeSelector key pair
 	NodeSelector map[string]string `yaml:"node_selector" json:"nodeSelector,omitempty"`
+	// Priority class name for NodeLocal's "node-local-dns" daemonset
+	NodeLocalDNSPriorityClassName string `yaml:"node_local_dns_priority_class_name" json:"nodeLocalDnsPriorityClassName,omitempty"`
 }
 
 // LinearAutoscalerParams contains fields expected by the cluster-proportional-autoscaler https://github.com/kubernetes-incubator/cluster-proportional-autoscaler/blob/0c61e63fc81449abdd52315aa27179a17e5d1580/pkg/autoscaler/controller/linearcontroller/linear_controller.go#L50
