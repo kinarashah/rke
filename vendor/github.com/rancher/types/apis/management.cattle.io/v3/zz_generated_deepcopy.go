@@ -2990,6 +2990,13 @@ func (in *DNSConfig) DeepCopyInto(out *DNSConfig) {
 			(*out)[key] = val
 		}
 	}
+	if in.KeySelector != nil {
+		in, out := &in.KeySelector, &out.KeySelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.Nodelocal != nil {
 		in, out := &in.Nodelocal, &out.Nodelocal
 		*out = new(Nodelocal)
