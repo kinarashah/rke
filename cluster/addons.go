@@ -493,7 +493,7 @@ func (c *Cluster) doAddonDeploy(ctx context.Context, addonYaml, resourceName str
 	if err != nil {
 		return &addonError{fmt.Sprintf("Failed to get Node [%s]: %v", c.ControlPlaneHosts[0].HostnameOverride, err), isCritical}
 	}
-	addonJob, err := addons.GetAddonsExecuteJob(resourceName, node.Name, c.Services.KubeAPI.Image)
+	addonJob, err := addons.GetAddonsExecuteJob(resourceName, node.Name, c.Services.KubeAPI.Image, c.Version)
 
 	if err != nil {
 		return &addonError{fmt.Sprintf("Failed to generate addon execute job: %v", err), isCritical}
@@ -514,7 +514,7 @@ func (c *Cluster) doAddonDelete(ctx context.Context, resourceName string, isCrit
 	if err != nil {
 		return &addonError{fmt.Sprintf("Failed to get Node [%s]: %v", c.ControlPlaneHosts[0].HostnameOverride, err), isCritical}
 	}
-	deleteJob, err := addons.GetAddonsDeleteJob(resourceName, node.Name, c.Services.KubeAPI.Image)
+	deleteJob, err := addons.GetAddonsDeleteJob(resourceName, node.Name, c.Services.KubeAPI.Image, c.Version)
 	if err != nil {
 		return &addonError{fmt.Sprintf("Failed to generate addon delete job: %v", err), isCritical}
 	}
@@ -522,7 +522,7 @@ func (c *Cluster) doAddonDelete(ctx context.Context, resourceName string, isCrit
 		return &addonError{fmt.Sprintf("%v", err), isCritical}
 	}
 	// At this point, the addon should be deleted. We need to clean up by deleting the deploy and delete jobs.
-	tmpJobYaml, err := addons.GetAddonsExecuteJob(resourceName, node.Name, c.Services.KubeAPI.Image)
+	tmpJobYaml, err := addons.GetAddonsExecuteJob(resourceName, node.Name, c.Services.KubeAPI.Image, c.Version)
 	if err != nil {
 		return err
 	}
