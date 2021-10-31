@@ -1,16 +1,16 @@
 package hosts
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
-	"k8s.io/client-go/transport"
-
 	v3 "github.com/rancher/rke/types"
 	"golang.org/x/crypto/ssh"
+	"k8s.io/client-go/transport"
 )
 
 const (
@@ -18,6 +18,7 @@ const (
 )
 
 type DialerFactory func(h *Host) (func(network, address string) (net.Conn, error), error)
+type DialerFunc func(h *Host) (func(ctx context.Context, address string) (net.Conn, error), error)
 
 type dialer struct {
 	signer          ssh.Signer
@@ -34,6 +35,7 @@ type dialer struct {
 type DialersOptions struct {
 	DockerDialerFactory    DialerFactory
 	LocalConnDialerFactory DialerFactory
+	NetworkDialerFactory   DialerFunc
 	K8sWrapTransport       transport.WrapperFunc
 }
 
@@ -119,6 +121,15 @@ func SSHFactory(h *Host) (func(network, address string) (net.Conn, error), error
 func LocalConnFactory(h *Host) (func(network, address string) (net.Conn, error), error) {
 	dialer, err := newDialer(h, "network")
 	return dialer.Dial, err
+}
+
+func LocalConnFactory2(h *Host) (func(ctx context.Context, address string) (net.Conn, error), error) {
+	dialer, err := newDialer(h, "network")
+	return dialer.Dial2, err
+}
+
+func (d *dialer) Dial2(ctx context.Context, addr string) (net.Conn, error) {
+	return d.Dial("network", addr)
 }
 
 func (d *dialer) DialDocker(network, addr string) (net.Conn, error) {

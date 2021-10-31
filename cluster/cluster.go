@@ -61,6 +61,7 @@ type Cluster struct {
 	KubernetesServiceIP              []net.IP
 	LocalKubeConfigPath              string
 	LocalConnDialerFactory           hosts.DialerFactory
+	NetworkDialerFactory             hosts.DialerFunc
 	PrivateRegistriesMap             map[string]v3.PrivateRegistry
 	StateFilePath                    string
 	UpdateWorkersOnly                bool
@@ -769,6 +770,7 @@ func (c *Cluster) SetupDialers(ctx context.Context, dailersOptions hosts.Dialers
 	c.DockerDialerFactory = dailersOptions.DockerDialerFactory
 	c.LocalConnDialerFactory = dailersOptions.LocalConnDialerFactory
 	c.K8sWrapTransport = dailersOptions.K8sWrapTransport
+	c.NetworkDialerFactory = dailersOptions.NetworkDialerFactory
 	// Create k8s wrap transport for bastion host
 	if len(c.BastionHost.Address) > 0 {
 		var err error
