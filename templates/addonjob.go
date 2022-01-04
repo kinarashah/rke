@@ -12,6 +12,8 @@ metadata:
   name: {{$addonName}}-delete-job
 {{- else }}
   name: {{$addonName}}-deploy-job
+  finalizers:
+  - cattle.io/do-not-delete
 {{- end }}
   namespace: kube-system
 spec:
