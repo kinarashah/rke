@@ -490,9 +490,6 @@ func (c *Cluster) BuildKubeletProcess(host *hosts.Host, serviceOptions v3.Kubern
 		if host.IsWindows() { // compatible with Windows
 			CommandArgs["cloud-config"] = path.Join(host.PrefixPath, cloudConfigFileName)
 		}
-		if c.CloudProvider.Name == k8s.AWSCloudProvider {
-			delete(CommandArgs, "hostname-override")
-		}
 	}
 
 	if c.IsKubeletGenerateServingCertificateEnabled() {
@@ -690,7 +687,8 @@ func (c *Cluster) BuildKubeProxyProcess(host *hosts.Host, serviceOptions v3.Kube
 		} else {
 			CommandArgs["bind-address"] = host.Address
 		}
-		if c.CloudProvider.Name == k8s.AWSCloudProvider {
+		if c.CloudProvider.Name == k8s.AWSCloudProvider && *c.CloudProvider.UseInstanceMetadataHostname {
+			// rke-tools will inject hostname from ec2 instance metadata
 			delete(CommandArgs, "hostname-override")
 		}
 	}
