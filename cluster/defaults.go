@@ -264,9 +264,9 @@ func (c *Cluster) setClusterDefaults(ctx context.Context, flags ExternalFlags) e
 		c.ForceDeployCerts = true
 	}
 
-	if c.CloudProvider.Name == k8s.AWSCloudProvider && c.CloudProvider.UseInstanceMetadataHostname == nil {
-		c.CloudProvider.UseInstanceMetadataHostname = &defaultUseInstanceMetadataHostname
-	}
+	//if c.CloudProvider.Name == k8s.AWSCloudProvider && c.CloudProvider.UseInstanceMetadataHostname ==  {
+	//	c.CloudProvider.UseInstanceMetadataHostname = defaultUseInstanceMetadataHostname
+	//}
 
 	// enable cri-dockerd for k8s >= 1.24
 	err = c.setCRIDockerd()
