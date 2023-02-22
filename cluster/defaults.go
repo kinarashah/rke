@@ -22,7 +22,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	apiserverv1 "k8s.io/apiserver/pkg/apis/apiserver/v1"
+	apiserverv1alpha1 "k8s.io/apiserver/pkg/apis/apiserver/v1alpha1"
 	auditv1 "k8s.io/apiserver/pkg/apis/audit/v1"
 )
 
@@ -445,8 +445,8 @@ func newDefaultAuditLogConfig() *v3.AuditLogConfig {
 	return c
 }
 
-func getEventRateLimitPluginFromConfig(c *v3.Configuration) (apiserverv1.AdmissionPluginConfiguration, error) {
-	plugin := apiserverv1.AdmissionPluginConfiguration{
+func getEventRateLimitPluginFromConfig(c *v3.Configuration) (apiserverv1alpha1.AdmissionPluginConfiguration, error) {
+	plugin := apiserverv1alpha1.AdmissionPluginConfiguration{
 		Name: EventRateLimitPluginName,
 		Configuration: &runtime.Unknown{
 			ContentType: "application/json",
@@ -478,8 +478,8 @@ func newDefaultEventRateLimitConfig() *v3.Configuration {
 	}
 }
 
-func newDefaultEventRateLimitPlugin() (apiserverv1.AdmissionPluginConfiguration, error) {
-	plugin := apiserverv1.AdmissionPluginConfiguration{
+func newDefaultEventRateLimitPlugin() (apiserverv1alpha1.AdmissionPluginConfiguration, error) {
+	plugin := apiserverv1alpha1.AdmissionPluginConfiguration{
 		Name: EventRateLimitPluginName,
 		Configuration: &runtime.Unknown{
 			ContentType: "application/json",
@@ -496,12 +496,12 @@ func newDefaultEventRateLimitPlugin() (apiserverv1.AdmissionPluginConfiguration,
 	return plugin, nil
 }
 
-func newDefaultAdmissionConfiguration() (*apiserverv1.AdmissionConfiguration, error) {
-	var admissionConfiguration *apiserverv1.AdmissionConfiguration
-	admissionConfiguration = &apiserverv1.AdmissionConfiguration{
+func newDefaultAdmissionConfiguration() (*apiserverv1alpha1.AdmissionConfiguration, error) {
+	var admissionConfiguration *apiserverv1alpha1.AdmissionConfiguration
+	admissionConfiguration = &apiserverv1alpha1.AdmissionConfiguration{
 		TypeMeta: v1.TypeMeta{
 			Kind:       "AdmissionConfiguration",
-			APIVersion: apiserverv1.SchemeGroupVersion.String(),
+			APIVersion: apiserverv1alpha1.SchemeGroupVersion.String(),
 		},
 	}
 	return admissionConfiguration, nil
