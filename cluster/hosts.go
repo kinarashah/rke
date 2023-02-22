@@ -282,16 +282,15 @@ func (c *Cluster) SetUpHosts(ctx context.Context, flags ExternalFlags) error {
 
 		if _, ok := c.Services.KubeAPI.ExtraArgs[KubeAPIArgAdmissionControlConfigFile]; !ok {
 			controlPlaneHosts := hosts.GetUniqueHostList(nil, c.ControlPlaneHosts, nil)
-			admissionConfig, err := c.getConsolidatedAdmissionConfiguration()
+			ac, err := c.getConsolidatedAdmissionConfiguration()
 			if err != nil {
 				return fmt.Errorf("error getting consolidated admission configuration: %v", err)
 			}
-			bytes, err := yaml.Marshal(admissionConfig)
+			bytes, err := yaml.Marshal(ac)
 			if err != nil {
 				return err
 			}
-			err = deployFile(ctx, controlPlaneHosts, c.SystemImages.Alpine, c.PrivateRegistriesMap, DefaultKubeAPIArgAdmissionControlConfigFileValue, string(bytes), c.Version)
-			if err != nil {
+			if err := deployFile(ctx, controlPlaneHosts, c.SystemImages.Alpine, c.PrivateRegistriesMap, DefaultKubeAPIArgAdmissionControlConfigFileValue, string(bytes), c.Version); err != nil {
 				return err
 			}
 			log.Infof(ctx, "[%s] Successfully deployed admission control config to Cluster control nodes", DefaultKubeAPIArgAdmissionControlConfigFileValue)

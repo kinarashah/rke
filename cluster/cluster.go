@@ -412,15 +412,15 @@ func parseEventRateLimit(clusterFile string, rkeConfig *v3.RancherKubernetesEngi
 		return nil
 	}
 	logrus.Debugf("event rate limit is found in cluster.yml")
-	var parsedClusterFile map[string]interface{}
-	err := ghodssyaml.Unmarshal([]byte(clusterFile), &parsedClusterFile)
+	var r map[string]interface{}
+	err := ghodssyaml.Unmarshal([]byte(clusterFile), &r)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling: %v", err)
 	}
-	if parsedClusterFile["services"] == nil {
+	if r["services"] == nil {
 		return nil
 	}
-	cfg, found, err := unstructured.NestedMap(parsedClusterFile, "services", "kube-api", "event_rate_limit", "configuration")
+	cfg, found, err := unstructured.NestedMap(r, "services", "kube-api", "event_rate_limit", "configuration")
 	if err != nil {
 		return err
 	}
