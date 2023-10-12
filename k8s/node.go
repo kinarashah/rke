@@ -55,6 +55,13 @@ func GetNode(k8sClient *kubernetes.Clientset, nodeName string) (*v1.Node, error)
 			if strings.ToLower(node.Labels[HostnameLabel]) == strings.ToLower(nodeName) {
 				return &node, nil
 			}
+			for _, addr := range node.Status.Addresses {
+				logrus.Infof("checking address %v %v %v", addr.Type, addr.Address, strings.ToLower(node.Labels[HostnameLabel]))
+				if addr.Type == v1.NodeHostName && strings.ToLower(node.Labels[HostnameLabel]) == addr.Address {
+					logrus.Infof("returning node from hostname match!! %v", addr.String())
+					return &node, nil
+				}
+			}
 		}
 		time.Sleep(time.Second * RetryInterval)
 	}
