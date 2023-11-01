@@ -43,10 +43,12 @@ func getEtcdClientV2(ctx context.Context, etcdHost *hosts.Host, localConnDialerF
 }
 
 func getEtcdClientV3(ctx context.Context, etcdHost *hosts.Host, localConnDialerFactory hosts.DialerFactory, cert, key []byte) (*etcdclientv3.Client, error) {
+	logrus.Infof("getEtcdDialer %s", etcdHost.Address)
 	dialer, err := getEtcdDialer(localConnDialerFactory, etcdHost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a dialer for host [%s]: %v", etcdHost.Address, err)
 	}
+	logrus.Infof("getEtcdTLSConfig %s", etcdHost.Address)
 	tlsConfig, err := getEtcdTLSConfig(cert, key)
 	if err != nil {
 		return nil, err
@@ -56,10 +58,17 @@ func getEtcdClientV3(ctx context.Context, etcdHost *hosts.Host, localConnDialerF
 		Endpoints:   []string{"https://" + etcdHost.InternalAddress + ":2379"},
 		TLS:         tlsConfig,
 		DialOptions: []grpc.DialOption{grpc.WithContextDialer(wrapper(dialer))},
+		DialTimeout: 15 * time.Second,
+		Context:     ctx,
 	}
 
-	return etcdclientv3.New(cfg)
+	cl, err := etcdclientv3.New(cfg)
+	if err != nil {
+		logrus.Infof("ERRROR FINALLY CLIENT %v", err)
+	}
 
+	logrus.Infof("GOT NEW CLIENT!!! getEtcdCLIENTNEWV3 RETURN!!!!")
+	return cl, err
 }
 
 func wrapper(f func(network, address string) (net.Conn, error)) func(context.Context, string) (net.Conn, error) {
@@ -142,8 +151,10 @@ func getEtcdDialer(localConnDialerFactory hosts.DialerFactory, etcdHost *hosts.H
 	etcdHost.LocalConnPort = 2379
 	var etcdFactory hosts.DialerFactory
 	if localConnDialerFactory == nil {
+		logrus.Infof("HELLO WHY LOCALCONN")
 		etcdFactory = hosts.LocalConnFactory
 	} else {
+		logrus.Infof("localConnDialerFactory")
 		etcdFactory = localConnDialerFactory
 	}
 	return etcdFactory(etcdHost)

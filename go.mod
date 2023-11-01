@@ -4,6 +4,7 @@ go 1.20
 
 replace (
 	github.com/knative/pkg => github.com/rancher/pkg v0.0.0-20190514055449-b30ab9de040e
+	go.etcd.io/etcd/client/v3 => github.com/kinarashah/etcd/client/v3 v3.0.0-20231101201631-e0bc5d5b4bf2
 	// Replace some k8s modules with specific versions to get rid of the "unknown revision v0.0.0" error caused by the k8s.io/kubernetes module
 	// Upstream Issue: https://github.com/kubernetes/kubernetes/issues/79384
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.27.6

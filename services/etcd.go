@@ -181,22 +181,22 @@ func AddEtcdMember(ctx context.Context, toAddEtcdHost *hosts.Host, etcdHosts []*
 		if etcdClientV3Range(k8sVersion) {
 			etcdClient, err := getEtcdClientV3(ctx, host, localConnDialerFactory, cert, key)
 			if err != nil {
-				logrus.Debugf("Failed to create etcd client for host [%s]: %v", host.Address, err)
+				logrus.Infof("Failed to create etcd client for host [%s]: %v", host.Address, err)
 				continue
 			}
 			if _, err := etcdClient.MemberAdd(ctx, []string{peerURL}); err != nil {
-				logrus.Debugf("Failed to Add etcd member [%s] from host: %v", host.Address, err)
+				logrus.Infof("Failed to Add etcd member [%s] from host: %v", host.Address, err)
 				continue
 			}
 		} else {
 			etcdClient, err := getEtcdClientV2(ctx, host, localConnDialerFactory, cert, key)
 			if err != nil {
-				logrus.Debugf("Failed to create etcd client for host [%s]: %v", host.Address, err)
+				logrus.Infof("Failed to create etcd client for host [%s]: %v", host.Address, err)
 				continue
 			}
 			memAPI := etcdclientv2.NewMembersAPI(etcdClient)
 			if _, err := memAPI.Add(ctx, peerURL); err != nil {
-				logrus.Debugf("Failed to Add etcd member [%s] from host: %v", host.Address, err)
+				logrus.Infof("Failed to Add etcd member [%s] from host: %v", host.Address, err)
 				continue
 			}
 		}
@@ -306,6 +306,7 @@ func ReloadEtcdCluster(ctx context.Context, readyEtcdHosts []*hosts.Host, newHos
 		return err
 	}
 
+	logrus.Infof("DORUNCONTAINER! %s %#v", EtcdContainerName, newHost)
 	if err := docker.DoRunContainer(ctx, newHost.DClient, imageCfg, hostCfg, EtcdContainerName, newHost.Address, ETCDRole, prsMap); err != nil {
 		return err
 	}
@@ -334,24 +335,32 @@ func ReloadEtcdCluster(ctx context.Context, readyEtcdHosts []*hosts.Host, newHos
 func IsEtcdMember(ctx context.Context, etcdHost *hosts.Host, etcdHosts []*hosts.Host, localConnDialerFactory hosts.DialerFactory,
 	k8sVersion string, cert, key []byte) (bool, error) {
 	var listErr error
+	logrus.Infof("IsETCDMember trying to CHECK AND ADD %#v", etcdHost.Address)
 	peerURL := fmt.Sprintf("https://%s:2380", etcdHost.InternalAddress)
 	for _, host := range etcdHosts {
 		if host.Address == etcdHost.Address {
+			logrus.Infof("cheeckkkkk continue %s", host.Address)
 			continue
 		}
+		logrus.Infof("CURRENT COMPARISON HOST: %s", host.Address)
 		if etcdClientV3Range(k8sVersion) {
+			ctx, _ = context.WithTimeout(ctx, 15*time.Second)
+			logrus.Infof("etcdClientV3Range ENTER")
 			etcdClient, err := getEtcdClientV3(ctx, host, localConnDialerFactory, cert, key)
 			if err != nil {
+				logrus.Infof("getETCDCLientV3 ERROR %v", err)
 				listErr = errors.Wrapf(err, "Failed to create etcd client for host [%s]", host.Address)
-				logrus.Debugf("Failed to create etcd client for host [%s]: %v", host.Address, err)
+				logrus.Infof("Failed to create etcd client for host [%s]: %v", host.Address, err)
 				continue
 			}
+			logrus.Infof("etcdClient.MemberList CHECK")
 			members, err := etcdClient.MemberList(ctx)
 			if err != nil {
 				listErr = errors.Wrapf(err, "Failed to create etcd client for host [%s]", host.Address)
-				logrus.Debugf("Failed to list etcd cluster members [%s]: %v", etcdHost.Address, err)
+				logrus.Infof("Failed to list etcd cluster members [%s]: %v", etcdHost.Address, err)
 				continue
 			}
+			logrus.Infof("LOOP CHECKKKK %#v %s", members.Members, peerURL)
 			for _, member := range members.Members {
 				if strings.Contains(member.PeerURLs[0], peerURL) {
 					logrus.Infof("[etcd] member [%s] is already part of the etcd cluster", etcdHost.Address)
@@ -359,17 +368,18 @@ func IsEtcdMember(ctx context.Context, etcdHost *hosts.Host, etcdHosts []*hosts.
 				}
 			}
 		} else {
+			logrus.Infof("etcdClientV2Range ENTER")
 			etcdClient, err := getEtcdClientV2(ctx, host, localConnDialerFactory, cert, key)
 			if err != nil {
 				listErr = errors.Wrapf(err, "Failed to create etcd client for host [%s]", host.Address)
-				logrus.Debugf("Failed to create etcd client for host [%s]: %v", host.Address, err)
+				logrus.Infof("Failed to create etcd client for host [%s]: %v", host.Address, err)
 				continue
 			}
 			memAPI := etcdclientv2.NewMembersAPI(etcdClient)
 			members, err := memAPI.List(ctx)
 			if err != nil {
 				listErr = errors.Wrapf(err, "Failed to create etcd client for host [%s]", host.Address)
-				logrus.Debugf("Failed to list etcd cluster members [%s]: %v", etcdHost.Address, err)
+				logrus.Infof("Failed to list etcd cluster members [%s]: %v", etcdHost.Address, err)
 				continue
 			}
 			for _, member := range members {
@@ -387,6 +397,7 @@ func IsEtcdMember(ctx context.Context, etcdHost *hosts.Host, etcdHosts []*hosts.
 	if listErr != nil {
 		return false, listErr
 	}
+	logrus.Infof("RETURN FALSE NIL")
 	return false, nil
 }
 
@@ -1059,6 +1070,7 @@ func setEtcdPermissions(ctx context.Context, etcdHost *hosts.Host, prsMap map[st
 		}
 	}
 
+	logrus.Infof("RUNNING DO RUN ONETIMECONTAINER! ")
 	if err := docker.DoRunOnetimeContainer(ctx, etcdHost.DClient, imageCfg, hostCfg, EtcdPermFixContainerName,
 		etcdHost.Address, ETCDRole, prsMap); err != nil {
 		return err

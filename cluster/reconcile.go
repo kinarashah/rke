@@ -73,7 +73,7 @@ func ReconcileCluster(ctx context.Context, kubeCluster, currentCluster *Cluster,
 
 func reconcileWorker(ctx context.Context, currentCluster, kubeCluster *Cluster, kubeClient *kubernetes.Clientset) error {
 	// worker deleted first to avoid issues when worker+controller on same host
-	logrus.Debugf("[reconcile] Check worker hosts to be deleted")
+	logrus.Infof("[reconcile] Check worker hosts to be deleted")
 	wpToDelete := hosts.GetToDeleteHosts(currentCluster.WorkerHosts, kubeCluster.WorkerHosts, kubeCluster.InactiveHosts, false)
 	for _, toDeleteHost := range wpToDelete {
 		toDeleteHost.IsWorker = false
@@ -172,6 +172,11 @@ func reconcileHost(ctx context.Context, toDeleteHost *hosts.Host, worker, etcd b
 func reconcileEtcd(ctx context.Context, currentCluster, kubeCluster *Cluster, kubeClient *kubernetes.Clientset, svcOptionData map[string]*v3.KubernetesServicesOptions) error {
 	etcdToDelete := hosts.GetToDeleteHosts(currentCluster.EtcdHosts, kubeCluster.EtcdHosts, kubeCluster.InactiveHosts, false)
 	etcdToAdd := hosts.GetToAddHosts(currentCluster.EtcdHosts, kubeCluster.EtcdHosts)
+	hh := []string{}
+	for _, h := range etcdToAdd {
+		hh = append(hh, h.Address)
+	}
+	logrus.Infof("TOADDHOSTS: %v", hh)
 	clientCert := cert.EncodeCertPEM(currentCluster.Certificates[pki.KubeNodeCertName].Certificate)
 	clientKey := cert.EncodePrivateKeyPEM(currentCluster.Certificates[pki.KubeNodeCertName].Key)
 
@@ -197,18 +202,20 @@ func reconcileEtcd(ctx context.Context, currentCluster, kubeCluster *Cluster, ku
 }
 
 func addEtcdMembers(ctx context.Context, currentCluster, kubeCluster *Cluster, kubeClient *kubernetes.Clientset, svcOptionData map[string]*v3.KubernetesServicesOptions, clientCert, clientKey []byte, etcdToAdd []*hosts.Host) error {
-	log.Infof(ctx, "[reconcile] Check etcd hosts to be added")
+	log.Infof(ctx, "[reconcile] Check etcd hosts to be added %#v", etcdToAdd)
 	for _, etcdHost := range etcdToAdd {
 		kubeCluster.UpdateWorkersOnly = false
 		etcdHost.ToAddEtcdMember = true
 	}
 	for _, etcdHost := range etcdToAdd {
+		logrus.Infof("etcdAdd %#v", etcdHost.Address)
 		// Check if the host already part of the cluster -- this will cover cluster with lost quorum
 		isEtcdMember, err := services.IsEtcdMember(ctx, etcdHost, kubeCluster.EtcdHosts, currentCluster.LocalConnDialerFactory,
 			currentCluster.Version, clientCert, clientKey)
 		if err != nil {
 			return err
 		}
+		logrus.Infof("isEtcdMember %#v", isEtcdMember)
 		if !isEtcdMember {
 			if err := services.AddEtcdMember(ctx, etcdHost, kubeCluster.EtcdHosts, currentCluster.LocalConnDialerFactory,
 				currentCluster.Version, clientCert, clientKey); err != nil {
@@ -226,12 +233,16 @@ func addEtcdMembers(ctx context.Context, currentCluster, kubeCluster *Cluster, k
 			}
 			etcdNodePlanMap[etcdReadyHost.Address] = BuildRKEConfigNodePlan(ctx, kubeCluster, etcdReadyHost, svcOptions)
 		}
+
+		logrus.Infof("ReLoadEtcdCluster!!! %#v", etcdHost.Address)
 		// this will start the newly added etcd node and make sure it started correctly before restarting other node
 		// https://github.com/etcd-io/etcd/blob/master/Documentation/op-guide/runtime-configuration.md#add-a-new-member
 		if err := services.ReloadEtcdCluster(ctx, kubeCluster.EtcdReadyHosts, etcdHost, currentCluster.LocalConnDialerFactory, clientCert, clientKey, currentCluster.PrivateRegistriesMap, etcdNodePlanMap, kubeCluster.SystemImages.Alpine, kubeCluster.Version); err != nil {
 			return err
 		}
 	}
+
+	logrus.Infof("Return nil!!!")
 	return nil
 }
 
