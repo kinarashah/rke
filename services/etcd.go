@@ -337,14 +337,23 @@ func IsEtcdMember(ctx context.Context, etcdHost *hosts.Host, etcdHosts []*hosts.
 	var listErr error
 	logrus.Infof("IsETCDMember trying to CHECK AND ADD %#v", etcdHost.Address)
 	peerURL := fmt.Sprintf("https://%s:2380", etcdHost.InternalAddress)
+	hsts := []*hosts.Host{}
+	removed := []*hosts.Host{}
 	for _, host := range etcdHosts {
+		if host.ToAddEtcdMember {
+			hsts = append(hsts, host)
+		} else {
+			removed = append(removed, host)
+		}
+	}
+	hsts = append(hsts, removed...)
+	for _, host := range hsts {
 		if host.Address == etcdHost.Address {
 			logrus.Infof("cheeckkkkk continue %s", host.Address)
 			continue
 		}
 		logrus.Infof("CURRENT COMPARISON HOST: %s", host.Address)
 		if etcdClientV3Range(k8sVersion) {
-			ctx, _ = context.WithTimeout(ctx, 15*time.Second)
 			logrus.Infof("etcdClientV3Range ENTER")
 			etcdClient, err := getEtcdClientV3(ctx, host, localConnDialerFactory, cert, key)
 			if err != nil {
