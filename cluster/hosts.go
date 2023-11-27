@@ -89,7 +89,6 @@ func (c *Cluster) InvertIndexHosts() error {
 			newHost.BastionHost = c.BastionHost
 		}
 		for _, role := range host.Role {
-			logrus.Debugf("Host: " + host.Address + " has role: " + role)
 			switch role {
 			case services.ETCDRole:
 				newHost.IsEtcd = true
@@ -116,6 +115,7 @@ func (c *Cluster) InvertIndexHosts() error {
 		if !newHost.IsWorker {
 			newHost.ToDelLabels[workerRoleLabel] = "true"
 		}
+
 	}
 	return nil
 }
