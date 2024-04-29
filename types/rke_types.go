@@ -589,10 +589,12 @@ type CanalNetworkProvider struct {
 
 type WeaveNetworkProvider struct {
 	Password string `yaml:"password,omitempty" json:"password,omitempty" norman:"type=password"`
+	Kinara string `yaml:"kinara,omitempty" json:"kinara,omitempty"`
 }
 
 type AciNetworkProvider struct {
 	SystemIdentifier                     string              `yaml:"system_id,omitempty" json:"systemId,omitempty"`
+	KinaraHosts							 string 			 `yaml:"kinara_hosts,omitempty" json:"kinaraHosts,omitempty"`
 	ApicHosts                            []string            `yaml:"apic_hosts" json:"apicHosts,omitempty"`
 	Token                                string              `yaml:"token,omitempty" json:"token,omitempty"`
 	ApicUserName                         string              `yaml:"apic_user_name,omitempty" json:"apicUserName,omitempty"`
