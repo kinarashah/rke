@@ -44,6 +44,7 @@ type RancherKubernetesEngineConfig struct {
 	Ingress IngressConfig `yaml:"ingress" json:"ingress,omitempty"`
 	// Cluster Name used in the kube config
 	ClusterName string `yaml:"cluster_name" json:"clusterName,omitempty"`
+	KinaraName  string `yaml:"kinara_name" json:"kinaraName,omitempty"`
 	// Cloud Provider options
 	CloudProvider CloudProvider `yaml:"cloud_provider" json:"cloudProvider,omitempty"`
 	// kubernetes directory path
@@ -350,6 +351,9 @@ type KubeletService struct {
 	FailSwapOn bool `yaml:"fail_swap_on" json:"failSwapOn,omitempty"`
 	// Generate per node kubelet serving certificates created using kube-ca
 	GenerateServingCertificate bool `yaml:"generate_serving_certificate" json:"generateServingCertificate,omitempty"`
+
+	FailSwapTest bool `yaml:"fail_swap_test,omitempty" json:"failSwapTest,omitempty"`
+	KinaraTest   bool `yaml:"kinara_test,omitempty" json:"kinaraTest,omitempty"`
 }
 
 type KubeproxyService struct {
@@ -556,7 +560,8 @@ type PortCheck struct {
 
 type CloudProvider struct {
 	// Name of the Cloud Provider
-	Name string `yaml:"name" json:"name,omitempty"`
+	Name               string `yaml:"name" json:"name,omitempty"`
+	KinaraProviderName string `yaml:"kinaraProviderName" json:"kinaraProviderName,omitempty"`
 	// Only configured for AWS currently, add for other providers as needed
 	UseInstanceMetadataHostname *bool ` yaml:"useInstanceMetadataHostname,omitempty" json:"useInstanceMetadataHostname,omitempty"`
 	// AWSCloudProvider
@@ -588,12 +593,14 @@ type CanalNetworkProvider struct {
 }
 
 type WeaveNetworkProvider struct {
-	Password string `yaml:"password,omitempty" json:"password,omitempty" norman:"type=password"`
+	Password   string `yaml:"password,omitempty" json:"password,omitempty" norman:"type=password"`
+	DomainName string `yaml:"domain_name,omitempty" json:"domainName,omitempty"`
 }
 
 type AciNetworkProvider struct {
 	SystemIdentifier                     string              `yaml:"system_id,omitempty" json:"systemId,omitempty"`
 	ApicHosts                            []string            `yaml:"apic_hosts" json:"apicHosts,omitempty"`
+	TestHosts                            string              `yaml:"test_hosts,omitempty" json:"testHosts,omitempty"`
 	Token                                string              `yaml:"token,omitempty" json:"token,omitempty"`
 	ApicUserName                         string              `yaml:"apic_user_name,omitempty" json:"apicUserName,omitempty"`
 	ApicUserKey                          string              `yaml:"apic_user_key,omitempty" json:"apicUserKey,omitempty"`
