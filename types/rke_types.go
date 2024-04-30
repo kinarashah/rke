@@ -43,6 +43,7 @@ type RancherKubernetesEngineConfig struct {
 	Ingress IngressConfig `yaml:"ingress" json:"ingress,omitempty"`
 	// Cluster Name used in the kube config
 	ClusterName string `yaml:"cluster_name" json:"clusterName,omitempty"`
+	KinaraName string `yaml:"kinara_name" json:"kinaraName,omitempty"`
 	// Cloud Provider options
 	CloudProvider CloudProvider `yaml:"cloud_provider" json:"cloudProvider,omitempty"`
 	// kubernetes directory path
@@ -591,7 +592,9 @@ type WeaveNetworkProvider struct {
 type AciNetworkProvider struct {
 	SystemIdentifier                     string              `yaml:"system_id,omitempty" json:"systemId,omitempty"`
 	ApicHosts                            []string            `yaml:"apic_hosts" json:"apicHosts,omitempty"`
+	BpicHosts                            []string            `yaml:"bpic_hosts" json:"bpicHosts,omitempty"`
 	Token                                string              `yaml:"token,omitempty" json:"token,omitempty"`
+	BokenName                            string              `yaml:"boken_name,omitempty" json:"bokenName,omitempty"`
 	ApicUserName                         string              `yaml:"apic_user_name,omitempty" json:"apicUserName,omitempty"`
 	ApicUserKey                          string              `yaml:"apic_user_key,omitempty" json:"apicUserKey,omitempty"`
 	ApicUserCrt                          string              `yaml:"apic_user_crt,omitempty" json:"apicUserCrt,omitempty"`
