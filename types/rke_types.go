@@ -44,6 +44,8 @@ type RancherKubernetesEngineConfig struct {
 	Ingress IngressConfig `yaml:"ingress" json:"ingress,omitempty"`
 	// Cluster Name used in the kube config
 	ClusterName string `yaml:"cluster_name" json:"clusterName,omitempty"`
+
+	KinaraName  string  `json:"kinaraName,omitempty" yaml:"kinaraName,omitempty"`
 	// Cloud Provider options
 	CloudProvider CloudProvider `yaml:"cloud_provider" json:"cloudProvider,omitempty"`
 	// kubernetes directory path
