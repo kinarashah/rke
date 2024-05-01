@@ -599,6 +599,7 @@ type AciNetworkProvider struct {
 	Token                                string              `yaml:"token,omitempty" json:"token,omitempty"`
 	BokenName							 string              `yaml:"boken_name,omitempty" json:"bokenName,omitempty"`
 	KinaraName							 string 			 `yaml:"kinara_name,omitempty" json:"kinaraName,omitempty"`
+	JakeName                             string              `yaml:"jake_name,omitempty" json:"jakeName,omitempty"`
 	ApicUserName                         string              `yaml:"apic_user_name,omitempty" json:"apicUserName,omitempty"`
 	ApicUserKey                          string              `yaml:"apic_user_key,omitempty" json:"apicUserKey,omitempty"`
 	ApicUserCrt                          string              `yaml:"apic_user_crt,omitempty" json:"apicUserCrt,omitempty"`
