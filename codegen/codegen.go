@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/coreos/go-semver/semver"
 	"github.com/rancher/rke/metadata"
@@ -57,6 +58,9 @@ func getURL() string {
 	if u == "" {
 		u = defaultDevURL
 		tag := os.Getenv("TAG")
+		if strings.HasPrefix(tag, "v") {
+			tag = tag[1:]
+		}
 		if v, err := semver.NewVersion(tag); err == nil {
 			if v.PreRelease == "" && v.String() != "" {
 				u = defaultReleaseURL

@@ -17,19 +17,19 @@ func TestGetURL(t *testing.T) {
 		{
 			name:        "No Metadata URL and TAG is release version",
 			envVar:      "",
-			tag:         "1.0.0",
+			tag:         "v1.0.0",
 			expectedURL: defaultReleaseURL,
 		},
 		{
 			name:        "No Metadata URL and TAG is pre-release version",
 			envVar:      "",
-			tag:         "1.0.0-alpha",
+			tag:         "v1.0.0-alpha",
 			expectedURL: defaultDevURL,
 		},
 		{
 			name:        "Metadata URL set",
 			envVar:      "https://example.com",
-			tag:         "1.0.0",
+			tag:         "v1.0.0",
 			expectedURL: "https://example.com",
 		},
 		{
