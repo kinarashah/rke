@@ -57,11 +57,15 @@ func getURL() string {
 	if u == "" {
 		u = defaultDevURL
 		tag := os.Getenv("TAG")
+		fmt.Println(tag)
 		if v, err := semver.NewVersion(tag); err == nil {
 			if v.PreRelease == "" && v.String() != "" {
 				u = defaultReleaseURL
 			}
+		} else {
+			fmt.Println(err)
 		}
 	}
+	fmt.Println(u)
 	return u
 }

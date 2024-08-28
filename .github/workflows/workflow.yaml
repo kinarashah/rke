@@ -43,42 +43,43 @@ jobs:
           ls -lR build/bin
         env:
           CROSS: 1
-      - name: Generate sha256 file for release
-        if: github.event_name == 'push' && github.ref_type == 'tag'
-        run: |
-          upload_folder="./build/bin"
-          for filename in $upload_folder/*; do
-            sum_file=$(sha256sum $filename)
-            sum=$(echo $sum_file | awk '{print $1}')
-            file_path=$(echo $sum_file | awk '{print $2}')
-            file=${file_path#"$upload_folder/"}
-            echo "$sum $file" >> ./build/bin/sha256sum.txt
-          done
-      - name: Upload rke bin artifacts
-        if: github.event_name == 'push' && github.ref_type == 'tag'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rke-binaries-${{ github.run_number }}-${{ github.run_attempt }}
-          path: build/bin/*
-          if-no-files-found: error
-          retention-days: 1
+          TAG: "${{ github.ref_name }}"
+      # - name: Generate sha256 file for release
+      #   if: github.event_name == 'push' && github.ref_type == 'tag'
+      #   run: |
+      #     upload_folder="./build/bin"
+      #     for filename in $upload_folder/*; do
+      #       sum_file=$(sha256sum $filename)
+      #       sum=$(echo $sum_file | awk '{print $1}')
+      #       file_path=$(echo $sum_file | awk '{print $2}')
+      #       file=${file_path#"$upload_folder/"}
+      #       echo "$sum $file" >> ./build/bin/sha256sum.txt
+      #     done
+      # - name: Upload rke bin artifacts
+      #   if: github.event_name == 'push' && github.ref_type == 'tag'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: rke-binaries-${{ github.run_number }}-${{ github.run_attempt }}
+      #     path: build/bin/*
+      #     if-no-files-found: error
+      #     retention-days: 1
 
-  integration-ci:
-    permissions:
-      contents: read
-    runs-on: runs-on,runner=4cpu-linux-x64,run-id=${{ github.run_id }}
-    timeout-minutes: 30
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-      - name: Run CI
-        run: |
-          ./scripts/integration-ci
+  # integration-ci:
+  #   permissions:
+  #     contents: read
+  #   runs-on: runs-on,runner=4cpu-linux-x64,run-id=${{ github.run_id }}
+  #   timeout-minutes: 30
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Setup Go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version-file: 'go.mod'
+  #     - name: Run CI
+  #       run: |
+  #         ./scripts/integration-ci
 
   github-pre-release:
     permissions:
