@@ -2,7 +2,7 @@ package cluster
 
 import (
 	"context"
-	"crypto/md5"
+	"crypto/sha256"
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -640,6 +640,8 @@ func (c *Cluster) BuildKubeletProcess(host *hosts.Host, serviceOptions v3.Kubern
 		Env = append(Env,
 			fmt.Sprintf("%s=%s", CloudConfigSumEnv, getStringChecksum(c.CloudConfigFile)))
 	}
+	str := "HELLO WORLD"
+	fmt.Sprintf("%s=%s", CloudConfigSumEnv, sha256.Sum256([]byte(str)))
 	if len(c.PrivateRegistriesMap) > 0 {
 		kubeletDockerConfig, _ := docker.GetKubeletDockerConfig(c.PrivateRegistriesMap)
 		Env = append(Env,
@@ -1270,7 +1272,7 @@ func (c *Cluster) getDefaultKubernetesServicesOptions(osType string) (v3.Kuberne
 }
 
 func getStringChecksum(config string) string {
-	configByteSum := md5.Sum([]byte(config))
+	configByteSum := sha256.Sum256([]byte(config))
 	return fmt.Sprintf("%x", configByteSum)
 }
 
