@@ -439,6 +439,7 @@ type AuthzConfig struct {
 type IngressConfig struct {
 	// Ingress controller type used by kubernetes
 	Provider string `yaml:"provider" json:"provider,omitempty" norman:"default=nginx"`
+	NewField string `yaml:"new_field" json:"newField,omitempty"`
 	// These options are NOT for configuring Ingress's addon template.
 	// They are used for its ConfigMap options specifically.
 	Options map[string]string `yaml:"options" json:"options,omitempty"`

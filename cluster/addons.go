@@ -65,6 +65,7 @@ type ingressOptions struct {
 	RBACConfig                              string
 	Options                                 map[string]string
 	NodeSelector                            map[string]string
+	NewField                                string
 	ExtraArgs                               map[string]string
 	ExtraEnvs                               []v3.ExtraEnv
 	ExtraVolumes                            []v3.ExtraVolume
@@ -589,6 +590,7 @@ func (c *Cluster) deployIngress(ctx context.Context, data map[string]interface{}
 		RBACConfig:        c.Authorization.Mode,
 		Options:           c.Ingress.Options,
 		NodeSelector:      c.Ingress.NodeSelector,
+		NewField:          c.Ingress.NewField,
 		ExtraArgs:         c.Ingress.ExtraArgs,
 		DNSPolicy:         c.Ingress.DNSPolicy,
 		IngressImage:      c.SystemImages.Ingress,
